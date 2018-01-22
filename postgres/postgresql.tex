@@ -1,0 +1,251 @@
+\documentclass[10pt,landscape, a4paper]{article}
+\usepackage{multicol}
+\usepackage[utf8]{inputenc}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage[landscape]{geometry}
+\usepackage[colorlinks=true]{hyperref}
+
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+	{ \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+
+\pagestyle{empty}
+ 
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}
+\makeatother
+
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+
+
+% -----------------------------------------------------------------------
+
+\begin{document}
+
+\raggedright
+\footnotesize
+\begin{multicols}{3}
+
+\begin{center}
+     \Large{\textbf{PostgreSQL (9.5) Cheat Sheet}} \\
+\end{center}
+
+
+\section{Sélection}
+
+ {\scriptsize \emph{\hspace{0.25em} Sélection de toutes les lignes et colonnes d'une table}}\newline 
+\texttt{SELECT} * \texttt{FROM} \emph{table}\texttt{;} \\
+
+ {\scriptsize \emph{\hspace{0.25em}Idem, mais limité à \emph{``colonne''}}}\newline 
+\texttt{SELECT} \emph{colonne} \texttt{FROM} \emph{table}\texttt{;} \\
+
+ \hspace{0.25em} {\scriptsize \emph{Limite la sélection aux lignes validant la \emph{condition}}} \\
+\texttt{SELECT * FROM} \emph{table} \texttt{WHERE} \emph{condition}\texttt{;}
+
+ \hspace{0.25em} {\scriptsize \emph{Limite la sélection aux \emph{n} premiers résultats}} \\
+\texttt{SELECT * FROM} \emph{table} \texttt{LIMIT} \emph{n}\texttt{;}
+
+\hspace{0.25em} {\scriptsize \emph{Idem, avec un décalage \emph{o} de la limite}} \\
+\texttt{SELECT * FROM} \emph{table} \texttt{LIMIT} \emph{n} \texttt{OFFSET} \emph{o}\texttt{;} 
+
+\subsection{Distinction}
+
+\hspace{0.25em} {\scriptsize \emph{Sélectionne toutes les lignes, sans doublons}} \\
+\texttt{SELECT DISTINCT * FROM} \emph{table\texttt{;}}
+
+\hspace{0.25em} {\scriptsize \emph{Sélectionne toutes les lignes, sans doublons}} \\
+\texttt{SELECT DISTINCT ON(\emph{colonne\_a, colonne\_b}) FROM} \emph{table\texttt{;}}
+
+\subsection{Agrégation de lignes}
+
+\hspace{0.25em} {\scriptsize \emph{Agrège les lignes selon la valeur de \emph{``colonne''}}} \\
+\texttt{SELECT \emph{fonc\_agg(colonne)} FROM} \emph{table} \texttt{GROUP BY} \emph{colonne}\texttt{;} 
+
+ \hspace{0.25em} {\scriptsize \emph{Principales fonctions d'agrégation}} \\
+\texttt{max, min, count, sum, avg, array\_agg, string\_agg, bool\_and, bool\_or}
+
+\subsection{Ordonnancement}
+ \hspace{0.25em} {\scriptsize \emph{Trie les résultats selon la valeur de \emph{``colonne''}}} \\
+\texttt{SELECT * FROM} \emph{table} \texttt{ORDER BY} \emph{colonne}\texttt{;}
+
+ \hspace{0.25em} {\scriptsize \emph{Trie les résultats selon la valeur de \emph{colonne\_a,} puis par la valeur de \emph{colonne\_b} par ordre décroissant}} \\
+\texttt{SELECT * FROM} \emph{table} \texttt{ORDER BY} \emph{colonne\_a, colonne\_b} DESC \texttt{;}
+
+\subsection{CTE}
+\hspace{0.25em} \emph{Sélectionne toutes les valeurs de \emph{``table''}} \\
+\texttt{WITH \emph{tableTemporaire} as (\\ \hspace{0.25em} SELECT * FROM} \emph{table}\texttt{\\)\\}\texttt{SELECT \emph{*} FROM \emph{tableTemporaire};} 
+
+\subsection{Signature synthétique}
+\texttt{[ WITH \emph{requête with} [, ...] ]] \newline
+SELECT [DISTINCT [ON (\emph{expression} [, ...])] \newline 
+ * | \emph{expression} [[AS] \emph{nom} [, ...]] \newline
+ [FROM \emph{table} [, ...]]\newline
+ [WHERE \emph{condition} [, ...]]\newline
+ [GROUP BY \emph{expression} [, ...]]\newline
+ [\{ UNION | INTERSECT | EXCEPT\}  [ALL] \emph{select}] \newline
+ [ORBER BY \emph{condition} [DESC] [, ...]]\newline
+ [LIMIT  \emph{count} [, ...]]\newline
+ [OFFSET \emph{start} [, ...]]}\texttt{;}
+
+\section{Opérateurs}
+
+ \hspace{0.25em} {\scriptsize \emph{Opérateurs logiques}} \\
+\texttt{AND, OR, NOT}
+
+ \hspace{0.25em} {\scriptsize \emph{Opérateurs génériques}} \\
+ \texttt{=, != \emph{ou} <> ,<, >,<=, >=, BETWEEN}
+
+\subsection{Pattern matching}
+ \hspace{0.25em} {\scriptsize \emph{Avec} \texttt{LIKE}} \\
+ \texttt{\_}~: n'importe quel caractère, apparaissant une fois\\ 
+ \texttt{\%}~: n'importe quelle séquence\\
+
+ \hspace{0.25em} {\scriptsize \emph{Avec} \texttt{SIMILAR TO}} \\
+ \texttt{|}~: ``ou'' logique\\ 
+ \texttt{+}~: une ou plusieurs apparitions\\
+ \texttt{*}~: zéro, une ou plusieurs apparitions\
+ \texttt{?}~: zéro ou une apparition\\
+ \texttt{\{\emph{m}\}}~: \emph{m} apparitions\\
+ \texttt{\{\emph{m,}\}}~: \emph{m} ou plus apparitions\\
+ \texttt{\{\emph{m, n}\}}~: entre \emph{m} et \emph{n} apparitions\\
+  Les opérateurs de \texttt{LIKE} restent valables\\ 
+  
+\emph{Exemples~:}\\
+ \hspace{0.25em} {\scriptsize \emph{Sélectionne les lignes où \emph{``colonne''} commence par \emph{``Pari''}}} \\
+{\scriptsize  \texttt{SELECT * FROM \emph{table} WHERE \emph{colonne} LIKE `Pari\%';}} \\
+
+ \hspace{0.25em} {\scriptsize \emph{Sélectionne les lignes où les deuxièmes et troisièmes caractères de \emph{``colonne''} sont des voyelles}} \\
+{\scriptsize  \texttt{SELECT * FROM \emph{table} \\ WHERE \emph{colonne} SIMILAR TO `\_(a|e|i|o|u|y)\{2\}\%';}} \\
+
+\section{Jointures}
+
+ \hspace{0.25em} {\scriptsize \emph{Ancienne syntaxe (dépréciée)}} \\
+\texttt{SELECT * FROM \emph{table\_a, table\_b} \\ 
+WHERE a.\emph{colonne\_jointure} = b.\emph{colonne\_jointure};}
+
+
+ \hspace{0.25em} {\scriptsize \emph{Syntaxe standard}} \\
+\texttt{SELECT * FROM \emph{table\_a} \\ JOIN \emph{table\_b} ON a.\emph{colonne\_jointure} = b.\emph{colonne\_jointure};}
+
+\hspace{0.25em} {\scriptsize \emph{Opérateurs de jointure de la syntaxe standard}} \\
+\texttt{CROSS JOIN}~: produit cartésien des deux tables\\ 
+\texttt{[INNER] JOIN}~: revoie les lignes vérifiant la condition de jointure\\
+\texttt{LEFT JOIN [OUTER]}~: revoie toutes les lignes de la table de gauche, ainsi que celles vérifiant la condition de jointure\\
+\texttt{RIGHT JOIN [OUTER]}~: idem, mais renvoie toutes les lignes de la table de droite\\
+ \texttt{FULL JOIN [OUTER]}~: renvoie les lignes jointes, auxquelles s'ajoutent toutes les lignes non jointes des deux tables\\
+ 
+\section{Insertion de données}
+ \hspace{0.25em} {\scriptsize \emph{Insertion de valeurs}} \\
+\texttt{INSET INTO \emph{table} VALUES (\emph{valeurs});}
+
+ \hspace{0.25em} {\scriptsize \emph{Insertion de valeurs, colonnes  choisies}} \\
+\texttt{INSET INTO \emph{table} (\emph{colonnes} [, ...]) \\ VALUES (\emph{valeurs} [, ...]);}
+
+ \hspace{0.25em} {\scriptsize \emph{Insertion de valeurs à partir d'une sélection}} \\
+\texttt{INSET INTO \emph{table} \emph{select};}
+
+ \hspace{0.25em} {\scriptsize \emph{Mise à jour de valeurs}} \\
+\texttt{UPDATE \emph{table} SET \emph{colonne} = \emph{expression};}
+
+ \hspace{0.25em} {\scriptsize \emph{Mise à jour de valeurs à partir d'une autre table}} \\
+\texttt{UPDATE \emph{table} SET \emph{colonne} = \emph{expression} \\FROM \emph{table} WHERE \emph{jointure};}
+
+\section{Manipulation de tables}
+ \hspace{0.25em} {\scriptsize \emph{Création d'une table}} \\
+\texttt{CREATE TABLE \emph{table} (\emph{colonne type} [, ...]);}
+
+ \hspace{0.25em} {\scriptsize \emph{Création d'une table avec une sélection}} \\
+\texttt{CREATE TABLE \emph{table} AS \emph{requête\_select};}
+
+ \hspace{0.25em} {\scriptsize \emph{Renommer une table}} \\
+\texttt{ALTER TABLE \emph{table} RENAME TO \emph{nom};}
+
+ \hspace{0.25em} {\scriptsize \emph{Suppression d'une table}} \\
+ \texttt{DROP TABLE \emph{table};}
+
+ \hspace{0.25em} {\scriptsize \emph{Ajout d'une colonne}} \\
+ \texttt{ALTER TABLE \emph{table} ADD COLUMN \emph{colonne type};}
+
+ \hspace{0.25em} {\scriptsize \emph{Suppression d'une colonne}} \\
+ \texttt{ALTER TABLE \emph{table} DROP COLUMN \emph{colonne};}
+
+ \hspace{0.25em} {\scriptsize \emph{Renommer une colonne}} \\
+ \texttt{ALTER TABLE \emph{table} RENAME COLUMN \emph{colonne} TO \emph{nom};}
+
+ \hspace{0.25em} {\scriptsize \emph{Modification du type d'une colonne}} \\
+ \texttt{ALTER TABLE \emph{table} ALTER COLUMN \emph{colonne} TYPE \emph{type};}
+
+\section{Manipulation de vues}
+ \hspace{0.25em} {\scriptsize \emph{Création d'une vue avec une sélection}} \\
+\texttt{CREATE VIEW \emph{vue} AS \emph{requête\_select};}
+
+ \hspace{0.25em} {\scriptsize \emph{Suppression d'une colonne}} \\
+ \texttt{ALTER DROP \emph{vue} DROP COLUMN \emph{colonne};}
+
+ \hspace{0.25em} {\scriptsize \emph{Suppression d'une vue}} \\
+ \texttt{DROP VIEW \emph{vue};}
+
+\section{Indexes}
+ \hspace{0.25em} {\scriptsize \emph{Création d'un index}} \\
+ \texttt{CREATE INDEX [\emph{nom}] ON \emph{table} (\emph{colonne});}
+ 
+  \hspace{0.25em} {\scriptsize \emph{Création d'un index de type donné}} \\
+ \texttt{CREATE INDEX [\emph{nom}] ON \emph{table} USING \emph{type} (\emph{colonne});}\\
+
+  \hspace{0.25em} {\scriptsize \emph{Renommer un index}} \\
+ \texttt{ALTER INDEX \emph{nom} RENAME  TO \emph{nom};}\\
+
+  \hspace{0.25em} {\scriptsize \emph{Supprimer un index}} \\
+ \texttt{DROP INDEX \emph{nom};}\\
+
+  \hspace{0.25em} {\scriptsize \emph{Principaux types d'indexes}} \\
+ \texttt{GIST, BTREE, BRIN, HASH}\\
+
+\section{Analyse des performances}
+  \hspace{0.25em} {\scriptsize \emph{Calcule et affiche la plan de requête}} \\
+ \texttt{EXPLAIN \emph{requête};}\\
+
+  \hspace{0.25em} {\scriptsize \emph{Calcul le plan de requête et le compare à la requête exécutée}} \\
+ \texttt{EXPLAIN ANALYSE \emph{requête};}\\
+
+\section{Entretien de la base}
+
+  \hspace{0.25em} {\scriptsize \emph{Supprime les tuples morts}} \\
+ \texttt{VACUUM;}\\
+
+  \hspace{0.25em} {\scriptsize \emph{Supprime les tuples morts, met à jour les statistiques des tables}} \\
+ \texttt{VACUUM ANALYSE;}\\
+
+
+\rule{0.3\linewidth}{0.25pt}
+\scriptsize
+CC-BY-SA, Mattia Bunel, 2018
+
+\href{https://github.com/MBunel/CheatSheets}{https://github.com/MBunel/CheatSheets}
+
+
+NB: Dans un souci de concision ce document ne respecte pas l'indentation traditionnelle. 
+
+\end{multicols}
+\end{document}
