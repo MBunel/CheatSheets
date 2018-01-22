@@ -1,6 +1,7 @@
 \documentclass[10pt,landscape, a4paper]{article}
 \usepackage{multicol}
 \usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
 \usepackage{calc}
 \usepackage{ifthen}
 \usepackage[landscape]{geometry}
@@ -48,7 +49,7 @@
 \begin{multicols}{3}
 
 \begin{center}
-     \Large{\textbf{PostgreSQL (9.5) Cheat Sheet}} \\
+     \Large{\textbf{PostgreSQL Cheat Sheet}} \\
 \end{center}
 
 
@@ -237,13 +238,13 @@ WHERE a.\emph{colonne\_jointure} = b.\emph{colonne\_jointure};}
   \hspace{0.25em} {\scriptsize \emph{Supprime les tuples morts, met à jour les statistiques des tables}} \\
  \texttt{VACUUM ANALYSE;}\\
 
-
 \rule{0.3\linewidth}{0.25pt}
 \scriptsize
 CC-BY-SA, Mattia Bunel, 2018
 
 \href{https://github.com/MBunel/CheatSheets}{https://github.com/MBunel/CheatSheets}
 
+Réalisé pour la version 9.5 de PostgreSQL
 
 NB: Dans un souci de concision ce document ne respecte pas l'indentation traditionnelle. 
 
