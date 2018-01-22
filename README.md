@@ -1,7 +1,7 @@
 # CheatSheets
 
-Ensemble de **CheatSheets** LaTeX sur différents logiciels.
+Ensemble de *CheatSheets* LaTeX sur différents logiciels.
 
-## Liste des fichiers
+## Liste des *CheatSheets:*
 * PostgreSQL
 * PostGIS
