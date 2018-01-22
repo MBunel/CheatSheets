@@ -197,6 +197,9 @@ WHERE a.\emph{colonne\_jointure} = b.\emph{colonne\_jointure};}
  \hspace{0.25em} {\scriptsize \emph{Modification du type d'une colonne}} \\
  \texttt{ALTER TABLE \emph{table} ALTER COLUMN \emph{colonne} TYPE \emph{type};}
 
+ \hspace{0.25em} {\scriptsize \emph{Ajout d'une  valeur par défaut}} \\
+ \texttt{ALTER TABLE \emph{table} ALTER COLUMN \emph{colonne} SET DEFAULT \emph{valeur};}
+
 \section{Manipulation de vues}
  \hspace{0.25em} {\scriptsize \emph{Création d'une vue avec une sélection}} \\
 \texttt{CREATE VIEW \emph{vue} AS \emph{requête\_select};}
