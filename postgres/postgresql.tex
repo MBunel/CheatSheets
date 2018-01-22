@@ -87,15 +87,22 @@
 \texttt{max, min, count, sum, avg, array\_agg, string\_agg, bool\_and, bool\_or}
 
 \subsection{Ordonnancement}
- \hspace{0.25em} {\scriptsize \emph{Trie les résultats selon la valeur de \emph{``colonne''}}} \\
-\texttt{SELECT * FROM} \emph{table} \texttt{ORDER BY} \emph{colonne}\texttt{;}
-
  \hspace{0.25em} {\scriptsize \emph{Trie les résultats selon la valeur de \emph{colonne\_a,} puis par la valeur de \emph{colonne\_b} par ordre décroissant}} \\
 \texttt{SELECT * FROM} \emph{table} \texttt{ORDER BY} \emph{colonne\_a, colonne\_b} DESC \texttt{;}
 
 \subsection{CTE}
 \hspace{0.25em} \emph{Sélectionne toutes les valeurs de \emph{``table''}} \\
 \texttt{WITH \emph{tableTemporaire} as (\\ \hspace{0.25em} SELECT * FROM} \emph{table}\texttt{\\)\\}\texttt{SELECT \emph{*} FROM \emph{tableTemporaire};} 
+
+\subsection{Opérations ensemblistes}
+\hspace{0.25em} {\scriptsize \emph{Renvoie l'union de deux requêtes (avec ou sans doublons)}} \\
+\emph{sélection} \texttt{UNION [ALL]} \emph{sélection}\texttt{;}
+
+\hspace{0.25em} {\scriptsize \emph{Renvoie l'intersection de deux requêtes (avec ou sans doublons)}} \\
+\emph{sélection} \texttt{INTERSECT [ALL]} \emph{sélection}\texttt{;}
+
+\hspace{0.25em} {\scriptsize \emph{Renvoie la différence de deux requêtes (avec ou sans doublons}} \\
+\emph{sélection} \texttt{EXCEPT [ALL]} \emph{sélection}\texttt{;}
 
 \subsection{Signature synthétique}
 \texttt{[ WITH \emph{requête with} [, ...] ]] \newline
@@ -110,7 +117,6 @@ SELECT [DISTINCT [ON (\emph{expression} [, ...])] \newline
  [OFFSET \emph{start} [, ...]]}\texttt{;}
 
 \section{Opérateurs}
-
  \hspace{0.25em} {\scriptsize \emph{Opérateurs logiques}} \\
 \texttt{AND, OR, NOT}
 
@@ -137,14 +143,15 @@ SELECT [DISTINCT [ON (\emph{expression} [, ...])] \newline
 {\scriptsize  \texttt{SELECT * FROM \emph{table} WHERE \emph{colonne} LIKE `Pari\%';}} \\
 
  \hspace{0.25em} {\scriptsize \emph{Sélectionne les lignes où les deuxièmes et troisièmes caractères de \emph{``colonne''} sont des voyelles}} \\
-{\scriptsize  \texttt{SELECT * FROM \emph{table} \\ WHERE \emph{colonne} SIMILAR TO `\_(a|e|i|o|u|y)\{2\}\%';}} \\
+{\scriptsize  \texttt{SELECT * FROM \emph{table} WHERE \emph{colonne} SIMILAR TO `\_(a|e|i|o|u|y)\{2\}\%';}} \\
+
+\section{Modification de types}
+ \texttt{CAST(\emph{expression} AS \emph{type})} {\scriptsize ou}  \texttt{\emph{expression}\texttt{::}\emph{type}}
 
 \section{Jointures}
-
  \hspace{0.25em} {\scriptsize \emph{Ancienne syntaxe (dépréciée)}} \\
 \texttt{SELECT * FROM \emph{table\_a, table\_b} \\ 
 WHERE a.\emph{colonne\_jointure} = b.\emph{colonne\_jointure};}
-
 
  \hspace{0.25em} {\scriptsize \emph{Syntaxe standard}} \\
 \texttt{SELECT * FROM \emph{table\_a} \\ JOIN \emph{table\_b} ON a.\emph{colonne\_jointure} = b.\emph{colonne\_jointure};}
