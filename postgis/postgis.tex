@@ -1,0 +1,225 @@
+\documentclass[10pt,landscape, a4paper]{article}
+\usepackage{multicol}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage[landscape]{geometry}
+\usepackage[colorlinks=true]{hyperref}
+
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+	{ \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+
+\pagestyle{empty}
+ 
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}
+\makeatother
+
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+
+
+% -----------------------------------------------------------------------
+
+\begin{document}
+
+\raggedright
+\footnotesize
+\begin{multicols}{3}
+
+\begin{center}
+     \Large{\textbf{Vectorial PostGIS Cheat Sheet}} \\
+\end{center}
+
+
+\section{Manipulation de colonnes géométriques }
+ \hspace{0.25em} {\scriptsize \emph{Ajouter une colonne de géométrie}} \\
+\texttt{SELECT AddGeometruColumn(\emph{table, colonne, srid, type, dimension});}
+
+ \hspace{0.25em} {\scriptsize \emph{Enlever une colonne de géométrie}} \\
+\texttt{SELECT DropGeometryColumn(\emph{schéma, table, colonne});}
+
+ \hspace{0.25em} {\scriptsize \emph{Changer le srid}} \\
+\texttt{SELECT UpdateGeometrySRID(\emph{table, colonne, srid});}
+
+ \hspace{0.25em} {\scriptsize \emph{Changer le srid  en modifiant les géométries}} \\
+\texttt{ALTER TABLE \emph{table}  ALTER COLUMN \emph{colonne de géométrie} \\ TYPE geometry(\emph{type de géométrie, srid}) \\  USING \emph{fonction\_de\_transformation};}
+
+\subsection{Types de géométries}
+\texttt{POINT, LINSESTRING, POLYGON, MULTIPOINT, MULTILINSESTRING, MULTIPOLYGON, GEOMETRYCOLLECTION}
+
+\section{Jointures spatiales}
+
+ \hspace{0.25em} {\scriptsize \emph{Syntaxe standard}} \\
+\texttt{SELECT * FROM \emph{table\_a} \\ JOIN \emph{table\_b} ON \emph{fonction(a.geom, b.geom)};}
+
+ \hspace{0.25em} {\scriptsize \emph{ou}} \\
+\texttt{SELECT * FROM \emph{table\_a} \\ JOIN \emph{table\_b} ON a.geom \emph{opérateur\_spatial} b.geom);}
+
+\subsection{Opérateurs spatiaux}
+ \hspace{0.25em} {\scriptsize\emph{a} et \emph{b} sont des enveloppes}\\
+\texttt{=}~:  \emph{a} et \emph{b} sont-elles identiques ?\\ 
+
+\texttt{\&\&}~: \emph{a} et \emph{b} s'intersectent-elles ?\\ 
+\texttt{\&\&\&}~:\emph{a} et \emph{b} (3D) s'intersectent-elles ? \\ 
+\texttt{\&<}~: \emph{a} est-elle à gauche ou chevauche-t-elle \emph{b}  ?\\ 
+\texttt{\&>}~: idem, mais à droite\\
+\texttt{\&<|}~: \emph{a} chevauche-t-elle ou est-elle en dessous de \emph{b}   ? \\
+\texttt{<<}~: \emph{a} est-elle à gauche de \emph{b} ?\\ 
+\texttt{<<|}~: \emph{a} est-elle en dessous de \emph{b} ?\\ 
+\texttt{>>}~: \emph{a} est-elle au dessus de \emph{b} ?\\
+\texttt{|>>}~: \emph{a} est-elle à droite de \emph{b} ?\\ 
+\texttt{@}~:  \emph{a} est-elle contenue dans \emph{b} ?\\ 
+\texttt{|\&>}~:  \emph{a} est-elle au-dessus ou chevauche-t-elle \emph{b}  ? \\ 
+\texttt{\~}~: \emph{a} contient t-elle \emph{b}  ? \\ 
+\texttt{\~\,=}~: \emph{a} et \emph{b} sont-elles identiques ?\\
+
+	\subsection{Autres fonctions}
+ \hspace{0.25em} {\scriptsize\emph{a} et \emph{b} sont des géométries}\\
+\texttt{ST\_Contains}~: \emph{a} contient-elle \emph{b} ?\\
+\texttt{ST\_ContainsProperly}~: idem, \emph{b} ne doit pas intersecter la limite de \emph{a} ?\\
+\texttt{ST\_Covers}~: \emph{a} couvre-t-elle \emph{b} ?\\
+\texttt{ST\_CoveredBy}~: \emph{a} est-elle couverte par \emph{b} ?\\
+\texttt{ST\_Crosses}~: les géométries ont-elles des points en commun (mais pas tous) ?\\
+\texttt{ST\_Disjoint}~: les géométries sont-elles distinctes ?\\
+\texttt{ST\_DWithin}~: \emph{b} est-elle à une distance \emph{d} de \emph{a} ? \\
+\texttt{ST\_DFullyWithin}~: idem, avec contrainte \emph{within}\\
+\texttt{ST\_Equals}~: les géométries sont-elles identiques ?\\
+\texttt{ST\_OrderingEquals}~: idem, avec points dans le même ordre ?\\
+\texttt{ST\_Intersects}~: intersection entre géométries ?\\
+\texttt{ST\_Overlaps}~: les géométries se recouvrent-elles (pas entièrement) ?\\
+
+\texttt{ST\_Relate}~: permet de modéliser d'autres relations\\
+\texttt{ST\_Touches}~: \emph{a} et \emph{b} se touchent-elles ?\\
+\texttt{ST\_Witihn}~: \emph{a} est-elle contenue dans \emph{b} ?\\
+
+\section{Mesures de distance entre objets}
+\texttt{ST\_3DDistance}~: distance (3D) entre deux géométries\\
+\texttt{ST\_3DMaxDistance}~: distance maximale (3D) entre deux géométries\\
+\texttt{ST\_Distance}~: distance entre deux géométries\\
+\texttt{ST\_HausdorffDistance}~:distance de Hausdorff\\
+\texttt{ST\_FrechetDistance}~: distance de Frechet\\
+\texttt{ST\_MaxDistance}~: distance maximale entre deux géométries\\
+\texttt{ST\_DistanceSphere}~: distance sur le sphéroïde\\
+\texttt{ST\_DistanceSpheroid}~: idem, avec choix du sphéroïde\\
+
+\subsection{Opérateurs}
+\texttt{<->}~: renvoie la distance 2D entre deux géométries\\
+\texttt{<\#>}~: renvoie la distance 2D entre les enveloppes\\
+\texttt{<<->>}~: renvoie la distance entre les centroïdes des enveloppes\\
+\texttt{<<\#>>}~: renvoie la distance 3D entre les enveloppes\\
+
+\section{Mesures de longueur et d'aires}
+\texttt{ST\_3DPerimeter}~:  périmètre (3D) d'une géométrie\\
+\texttt{ST\_Area}~: aire d'une géométrie\\
+\texttt{ST\_Azimuth}~: azimut d'une géométrie\\
+\texttt{ST\_Length}~:  longueur d'une géométrie \\
+\texttt{ST\_Length2D}~: longueur (2D) d'une géométrie\\
+\texttt{ST\_Length3D}~: longueur (3D) d'une géométrie\\
+\texttt{ST\_LengthSpheroid}~:  longueur (sur le sphéroïde) d'une géométrie\\
+\texttt{ST\_Perimeter}~: périmètre d'une géométrie\\
+
+\section{Extraction de géométries}
+\texttt{ST\_3DClosestPoint}~: revoie le point d'une géométrie \emph{b} le plus proche d'une géométrie \emph{a} (3D)\\
+\texttt{ST\_3DLongestLine}~: renvoie la ligne la plus longue entre deux géométries (3D)\\
+\texttt{ST\_3DShortestLine}~: renvoie la ligne la plus courte entre deux géométries (3D)\\
+\texttt{ST\_Boundary}~: renvoie la frontière de l'objet\\
+\texttt{ST\_BoundingDiagonal}~: revoie la diagonale de l'enveloppe\\
+\texttt{ST\_Buffer}~: crée un buffer\\
+\texttt{ST\_Centroid}~: renvoie le centroïde\\
+\texttt{ST\_ClosestPoint}~:  revoie le point d'une géométrie \emph{b} le plus proche d'une géométrie \emph{a}\\
+\texttt{ST\_ConcaveHull}~: renvoie l'enveloppe concave d'une géométrie\\
+\texttt{ST\_ConvexHull}~:  renvoie l'enveloppe convexe d'une géométrie\\
+\texttt{ST\_DelaunayTriangles}~: triangulation de Delaunay d'une géométrie\\
+\texttt{ST\_Difference}~: renvoie la différence entre deux géométries\\
+\texttt{ST\_EndPoint}~: renvoie le dernier point d'une ligne\\
+\texttt{ST\_Envelope}~: renvoie l'enveloppe \\
+\texttt{ST\_InteriorRingN}~: renvoie le \emph{n}\up{ième} anneau intérieur \\
+\texttt{ST\_Intersection}~: renvoie l'intersection de deux géométries\\
+\texttt{ST\_LongestLine}~: renvoie la ligne la plus longue entre deux géométries\\
+\texttt{ST\_PointN}~:  renvoie le \emph{n}\up{ième} point d'une ligne\\
+\texttt{ST\_Points}~: renvoie tous les points d'une géométrie\\
+\texttt{ST\_ShortestLine}~: renvoie la ligne la plus courte entre deux géométries\\
+\texttt{ST\_Split}~: découpe une géométrie par une autre\\
+\texttt{ST\_StartPoint}~: renvoie le premier point d'une ligne\\
+\texttt{ST\_SymDifference}~: la différence symétrique entre deux géométries\\
+\texttt{ST\_Subdivide}~: découpe une géométrie selon un nombre de points\\
+\texttt{ST\_Union}~: renvoie l'union de deux géométries\\
+\texttt{ST\_VoronoiPolygons}~: diagramme de Voronoï d'une géométrie\\
+\texttt{ST\_VoronoiLines}~: idem, mais ne renvoie que les limites\\
+
+\section{Transformation de géométries}
+\texttt{ST\_AddPoint}~: ajoute un point à une ligne\\
+\texttt{ST\_Force2D}~: transforme la géométrie en géométrie 2D\\
+\texttt{ST\_RemovePoint}~: enlève un point d'une ligne\\
+\texttt{ST\_Rotate}~: tourne une géométrie\\
+\texttt{ST\_Scale}~: change l'échelle d'une géométrie\\
+\texttt{ST\_Segmentize}~: découpe une géométrie en segments de longueur choisie\\
+\texttt{ST\_SetSRID}~: modifie le srid d'une géométrie (ne la reprojette pas)\\
+\texttt{ST\_Transform}~: reprojette une géométrie\\
+\texttt{ST\_Translate}~: translate une géométrie\\
+
+\section{Conversion de géométries}
+\texttt{ST\_AsBinary}~: converti la géométrie en WKB (format binaire)\\
+\texttt{ST\_AsText}~: converti la géométrie en WKT\\
+\texttt{ST\_AsKML}~:  converti la géométrie en KML\\
+\texttt{ST\_AsGML}~: idem, en GML\\
+
+\section{Généralisation}
+\texttt{ST\_Simplify}~: simplifie une géométrie\\
+\texttt{ST\_SimplifyPreserveTopology}~: idem, mais préserve la topologie\\
+\texttt{ST\_SimplifyVW}~: simplification avec l'algorithme de Visvalingam-Whyatt\\
+
+
+\section{Indexes spatiaux}
+  \hspace{0.25em} {\scriptsize \emph{Création d'un index spatial}} \\
+ \texttt{CREATE INDEX [\emph{nom}] ON \emph{table} USING GIST (\emph{colonne\_géométrie});}\\
+
+\section{Utilisation de \emph{SFCGAL}}
+ \hspace{0.25em} {\scriptsize \emph{Utilisation de \emph{SFCGAL}}} \\
+ \texttt{SET postgis.backend = sfcgal;}
+ 
+  \hspace{0.25em} {\scriptsize \emph{Utilisation du moteur par défaut}} \\
+ \texttt{SET postgis.backend = geos;}
+
+\subsection{Fonctions spécifiques}
+\texttt{ST\_Extrude}~:  extrude une surface\\
+\texttt{ST\_StraightSkeleton}~:  renvoie le squelette d'une géométrie \\
+\texttt{ST\_ApproximateMedialAxis}~: renvoie une approximation de l'axe médian d'une surface\\
+\texttt{ST\_Orientation}~: renvoie l'orientation d'une surface\\
+\texttt{ST\_Tesselate}~: calcule la tesselation d'un volume\\
+\texttt{ST\_Volume}~: calcule le volume d'un objet 3D\\
+
+\rule{0.3\linewidth}{0.25pt}
+\scriptsize
+CC-BY-SA, Mattia Bunel, 2018
+
+\href{https://github.com/MBunel/CheatSheets}{https://github.com/MBunel/CheatSheets}
+
+Réalisé pour la version  2.4  de PostGIS.
+
+NB: Dans un souci de concision ce document ne respecte pas l'indentation traditionnelle. 
+
+\end{multicols}
+\end{document}
