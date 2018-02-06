@@ -1,0 +1,221 @@
+\documentclass[10pt,landscape, a4paper]{article}
+\usepackage{multicol}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage[landscape]{geometry}
+\usepackage[colorlinks=true]{hyperref}
+
+\usepackage{xcolor}
+
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+	{ \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+
+\pagestyle{empty}
+ 
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}
+\makeatother
+
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+
+
+\definecolor{node3}{RGB}{228,26,28}
+\definecolor{node2}{RGB}{55,126,184}
+\definecolor{node}{RGB}{77,175,74}
+\definecolor{node4}{RGB}{152,78,163}
+
+\definecolor{table}{RGB}{177,89,40}
+\definecolor{table2}{RGB}{200,127,100}
+\definecolor{table3}{RGB}{200,127,100}
+
+\definecolor{mcost}{RGB}{252,141,89}
+\definecolor{Mcost}{RGB}{200,127,100}
+
+\definecolor{rows}{RGB}{2,12,200}
+\definecolor{width}{RGB}{51,160,44}
+
+\definecolor{filter}{RGB}{106,61,154}
+\definecolor{filter2}{RGB}{255,127,0}
+\definecolor{filter3}{RGB}{2,12,200}
+
+% -----------------------------------------------------------------------
+
+\begin{document}
+
+\raggedright
+\footnotesize
+\begin{multicols}{3}
+
+\begin{center}
+     \Large{\textbf{Explain Cheat Sheet}} \\
+\end{center}
+
+
+\section{Syntaxte}
+
+  \hspace{0.25em} {\scriptsize \emph{Syntaxe classique}} \\
+ \texttt{EXPLAIN [ANALYSE] [VERBOSE] \emph{requête};}\\
+
+  \hspace{0.25em} {\scriptsize \emph{Nouvelle syntaxe (9.0 et plus)}} \\
+ \texttt{EXPLAIN [(\emph{options,} ...)] \emph{requête};}\\
+ 
+ \hspace{0.25em} {\scriptsize \emph{Avec les \emph{options} suivantes :}} \\
+ \texttt{ANALYSE} \hspace{0.25em} {\scriptsize \emph{Exécute la commande et affiche les temps d'exécution}}\\
+ \texttt{VERBOSE}\hspace{0.25em} {\scriptsize \emph{Affiche des informations supplémentaires}}\\
+ \texttt{COSTS}\hspace{0.25em} {\scriptsize \emph{Affiche des informations détaillées sur les coûts}}\\
+ \texttt{BUFFERS}\hspace{0.25em} {\scriptsize \emph{Affiche les informations sur le cache}}\\
+ \texttt{FORMAT \{TEXT | XML | JSON | YAML\}} {\scriptsize \emph{Format de sortie}}\\
+
+\section{Lire un plan de requête}
+
+\hspace{0.25em} {\scriptsize \emph{Voici l'utilisation la plus simple d'\emph{\texttt{EXPLAIN:}}}}\\
+\texttt{EXPLAIN SELECT * FROM tab1;}\\
+\hspace{0.25em} {\scriptsize \emph{La commande renvoie le plan suivant :}}\\
+\texttt{\textcolor{node}{Seq Scan} on \textcolor{table}{tab1}  (cost=\textcolor{mcost}{0.00}..\textcolor{Mcost}{458.00} rows=\textcolor{rows}{10000} width=\textcolor{width}{244})}
+
+\hspace{0.25em} {\scriptsize \emph{Analyse :}}\\
+{\scriptsize Le moteur \textcolor{node}{parcourt séquentiellement} \textcolor{table}{la table} et renvoie toutes les lignes. \textcolor{Mcost}{Le coût total de l'opération est estimé à 458,} \textcolor{mcost}{le coût de traitement de la première ligne est de 0.} \textcolor{rows}{Environ 10\,000 lignes,} de \textcolor{width}{244 octets chacune} seront renvoyées.}
+
+\subsection{Requête avec filtre}
+
+\hspace{0.25em} {\scriptsize \emph{Ajoutons un premier filtre:}}\\
+\texttt{EXPLAIN SELECT * FROM tab1 WHERE col1 < 1000;}\\
+\hspace{0.25em} {\scriptsize \emph{La commande renvoie le plan suivant :}}\\
+\texttt{\textcolor{node}{Seq Scan} on \textcolor{table}{tab1}  (cost=0.00..\textcolor{Mcost}{483.00} rows=\textcolor{rows}{7033} width=244)}\\
+\texttt{Filter: \textcolor{filter}{(col1 < 1000)}}
+
+\hspace{0.25em} {\scriptsize \emph{Analyse :}}\\
+{\scriptsize Le moteur \textcolor{node}{parcourt séquentiellement} \textcolor{table}{la table} et renvoie \textcolor{filter}{les lignes validant le filtre.} Notez \textcolor{Mcost}{l'augmentation du coût} et \textcolor{rows}{la diminution du nombre de lignes estimées.}}
+
+\subsection{Filtres et index}
+\hspace{0.25em} {\scriptsize \emph{Utilisons un filtre plus contraignant:}}\\
+\texttt{EXPLAIN SELECT * FROM tab1 WHERE col1 < 100;}\\
+\hspace{0.25em} {\scriptsize \emph{La commande renvoie le plan suivant :}}\\
+
+
+\texttt{\textcolor{node2}{Bitmap Heap Scan} on tab1  (cost=2.37..232.35 rows=106 width=244)
+   Recheck Cond: \textcolor{filter2}{(col1 < 100)}\\
+\hspace{0.25em}  ->  \textcolor{node}{Bitmap Index Scan} on \textcolor{table}{tab1\_col1}  (cost=0.00..2.37 rows=106 width=0)
+         Index Cond: \textcolor{filter}{(col1 < 100)}}\\
+
+\hspace{0.25em} {\scriptsize \emph{Analyse :}}\\
+{\scriptsize Ce plan est un peu plus compliqué à lire car il est composé de deux instructions (plus une instruction est indentée, plus elle est exécutée tôt). Dans un premier temps  \textcolor{table}{l'index de la colonne \emph{col1}} \textcolor{node}{est interrogé} pour connaître les lignes validant  \textcolor{filter}{le filtre,} puis  \textcolor{node2}{le second nœud} récupère les pages sélectionnées,  \textcolor{filter2}{filtre les lignes} et les renvoie (après les avoir triées dans leur ordre d'apparition en mémoire).}
+
+\subsection{Filtres multiples}
+%
+\hspace{0.25em} {\scriptsize \emph{Ajoutons un premier filtre:}}\\
+\texttt{EXPLAIN SELECT * FROM tab1 WHERE col1 < 100 AND col2 > 9000;}\\
+\hspace{0.25em} {\scriptsize \emph{La commande renvoie le plan suivant :}}\\
+\texttt{Bitmap Heap Scan on tab1  (cost=25.08..60.21 rows=10 width=244)
+    Recheck Cond: ((col1 < 100) AND (col2 > 9000))\\
+     \hspace{0.25em} ->  \textcolor{node}{BitmapAnd}  (cost=\textcolor{mcost}{25.08}..25.08 rows=10 width=0)\\ 
+     	\hspace{0.75em} ->  Bitmap Index Scan on \textcolor{table}{tab1\_col1}  (cost=0.00..5.04 rows=101 width=0) Index Cond: (col1 < 100)\\
+         	\hspace{0.75em} ->  Bitmap Index Scan on \textcolor{table}{tab1\_col2}  (cost=0.00..19.78 rows=999 width=0)  Index Cond: (col2 > 9000)}
+
+\hspace{0.25em} {\scriptsize \emph{Analyse :}}\\
+{\scriptsize Ici les deux colonnes servant de filtre possèdent \textcolor{table}{un index.} Le planificateur a donc choisi d'utiliser \textcolor{node}{une combinaison binaire des indexes.} la combinaison binaire d'indexes est \textcolor{mcost}{un processus long à mettre en place} (il est nécessaire d'ordonner les lignes en fonction de leur position sur le disque, mais cette opération permet un gain de temps substantiel si de nombreuses lignes sont à récupérer), le planificateur peut par conséquent opter pour une autre approche.}
+
+\hspace{0.25em} {\scriptsize \emph{Modifions légèrement  la requête:}}\\
+\texttt{EXPLAIN SELECT * FROM tab1 WHERE col1 < 100 AND col2 > 9000 LIMIT 2;}\\
+\hspace{0.25em} {\scriptsize \emph{La commande renvoie le plan suivant :}}\\
+\texttt{Limit  (cost=0.29..14.48 rows=2 width=244)\\ 
+	\hspace{0.25em} ->  \textcolor{node}{Index Scan} \textcolor{table}{using tab1\_col2} on tab1  (cost=0.29..71.27 rows=10 width=244) Index Cond: (col2 > 9000) Filter: \textcolor{filter}{(col1 < 100)}}
+
+\hspace{0.25em} {\scriptsize \emph{Analyse :}}\\
+{\scriptsize Cette requête montre bien à quel point un petit changement (ajout d'une clause \emph{limit}) peut totalement changer un plan de requête. Le planificateur à choisi d'effectuer \textcolor{node}{une recherche} sur \textcolor{table}{l'index de la colonne \emph{col2}} puis de \textcolor{filter}{filtrer les lignes sélectionnées avec la colonne \emph{col1}} (La particularité \textcolor{node}{du nœud \texttt{Index Scan}} est que, contrairement à nœud \texttt{Bitmap Heap Scan,} les lignes ne sont pas triées en fonction de leur position sur le disque). Cette nouvelle approche permet de diminuer le coût de la requête en supprimant l'interrogation du second index et ce malgré le surcoût de récupération des lignes induit par \textcolor{node}{le nœud \texttt{Index Scan.}}}
+
+\subsection{Jointure et filtres}
+\hspace{0.25em} {\scriptsize \emph{Ajoutons un premier filtre:}}\\
+\texttt{EXPLAIN SELECT * FROM tab1 AS t1, tab2 AS t2 \\ WHERE t1.col1 < 10 AND t1.col2 = t2.col2;}\\
+%
+\hspace{0.25em} {\scriptsize \emph{La commande renvoie le plan suivant :}}\\
+%
+\texttt{\textcolor{node4}{Nested Loop}  (cost=4.65..118.62 rows=10 width=488)\\
+	\hspace{0.25em} ->   \textcolor{node2}{Bitmap Heap Scan} on tab1 t1  (cost=4.36..39.47 rows=10 width=244) Recheck Cond:  \textcolor{filter2}{(col1 < 10)} \\
+		\hspace{0.75em} ->   \textcolor{node}{Bitmap Index Scan} on tab1\_col1  (cost=0.00..4.36 rows=10 width=0) Index Cond:  \textcolor{filter}{(col1 < 10)}\\
+	\hspace{0.25em} ->   \textcolor{node3}{Index Scan} using tab2\_unique2 on \textcolor{table}{tab2} t2  (cost=0.29..7.91 rows=1 width=244) Index Cond: \textcolor{filter3}{(col2 = t1.col2)}}
+
+\hspace{0.25em} {\scriptsize \emph{Analyse :}}\\
+{\scriptsize L'ajout d'une jointure modifie grandement le plan précédent. La première étape est une nouvelle fois \textcolor{node}{la sélection par index des lignes}  \textcolor{filter}{validant la condition \texttt{col1 < 10}.} Comme précédemment les lignes concernées sont  \textcolor{node2}{récupérées par le nœud \texttt{Bitmap Heap Scan,}} après  \textcolor{filter2}{une nouvelle vérification de la condition.}  \textcolor{node3}{Le dernier nœud} extrait les lignes de la  \textcolor{table}{table \emph{tab2}} validant \textcolor{filter3}{la condition de jointure.} Finalement les lignes sont jointes dans le \textcolor{node4}{noeud \texttt{Nested Loop}} (il s'agit d'une boucle imbriquée parcourant les deux ensembles de lignes).}
+
+\subsection{Utilisation d'\texttt{ANALYSE}}
+
+\hspace{0.25em} {\scriptsize \emph{Reprenons la première requête et ajoutons l'option \texttt{analyse:}}}\\
+\texttt{EXPLAIN ANALYSE SELECT * FROM tab1;}\\
+\hspace{0.25em} {\scriptsize \emph{La commande renvoie le plan suivant :}}\\
+\texttt{Seq Scan on tab1  (cost=0.00..458.00 rows=10000 width=244) (actual time=\textcolor{filter2}{0.05}..\textcolor{filter3}{0.8} rows=\textcolor{node2}{9500} loops=\textcolor{node3}{1})\\
+ \textcolor{node}{Planning time: 0.181 ms}\\
+ \textcolor{filter}{Execution time: 0.80 ms}\\}
+\hspace{0.25em} {\scriptsize \emph{Analyse :}}\\
+{\scriptsize Aux informations déjà vues précédemment s'ajoutent, \textcolor{node}{la durée de la planification,} \textcolor{filter2}{le temps d'exécution pour la première,} \textcolor{filter3}{pour tous les lignes} et \textcolor{filter}{total,} \textcolor{node2}{le nombre de lignes réellement retournées} et \textcolor{node3}{le nombre d'exécutions de ce nœud.}}
+
+\section{Liste des nœuds}
+
+\hspace{0.25em} {\scriptsize \emph{Seuls les nœuds les  plus courants sont présentés.}}\\
+
+\subsection{Nœuds de parcours}
+\texttt{Seq Scan} \hspace{0.25em} {\scriptsize \emph{Parcours séquentiel de la table}}\\
+\texttt{Index Scan} \hspace{0.25em} {\scriptsize \emph{Recherche par index}}\\
+\texttt{Bitmap Heap Scan} \hspace{0.25em} {\scriptsize \emph{Recherche par index, algorithme alternatif}}\\
+\texttt{Index Only Scan} \hspace{0.25em} {\scriptsize \emph{Uniquement pour les \emph{index couvrants}}}\\
+
+\subsection{Nœuds de jointure (liste exhaustive)}
+\texttt{Nested Loop} \hspace{0.25em} {\scriptsize \emph{Boucles imbriquées}}\\
+\texttt{Merge Join} \hspace{0.25em} {\scriptsize \emph{Tri suivit d'une fusion}}\\
+\texttt{Hash Join} \hspace{0.25em} {\scriptsize \emph{Ne fonctionne qu'avec les égalités}}\\
+
+\subsection{Nœuds d’agrégation}
+\texttt{Aggregate} \hspace{0.25em} {\scriptsize \emph{Tri puis agrégation}}\\
+\texttt{GroupAggregate} \hspace{0.25em} {\scriptsize \emph{Nécessite un pré-tri}}\\
+\texttt{HashAggregate} \hspace{0.25em} {\scriptsize \emph{Hachage des données et regroupement}}\\
+
+\section{Pour aller plus loin}
+
+\subsection{Outils d'analyse}
+
+Un outil de visualisation d'explain \href{https://explain.depesz.com/}{https://explain.depesz.com/}
+
+Un autre outil du même type \href{http://tatiyants.com/pev/\#/plans}{http://tatiyants.com/pev/\#/plans}
+
+\subsection{Documentation}
+\emph{Use the index, Luke} \href{http://use-the-index-luke.com/fr/sql/plans-dexecution/postgresql/operations}{http://use-the-index-luke.com/fr/sql/plans-dexecution/postgresql/operations}
+
+Comprendre \emph{explain} \href{https://www.dalibo.org/\_media/comprendre\_explain.pdf}{https://www.dalibo.org/\_media/comprendre\_explain.pdf}
+
+Et bien entendu la documentation officielle \href{https://docs.postgresql.fr/9.5/performance-tips.html\#using-explain}{https://docs.postgresql.fr/9.5/performance-tips.html\#using-explain}
+
+\rule{0.3\linewidth}{0.25pt}
+\scriptsize
+CC-BY-SA, Mattia Bunel, 2018
+
+\href{https://github.com/MBunel/CheatSheets}{https://github.com/MBunel/CheatSheets}
+
+Réalisé pour la version 9.5 de PostgreSQL
+
+NB: Dans un souci de concision ce document ne respecte pas l'indentation traditionnelle. 
+
+\end{multicols}
+\end{document}
